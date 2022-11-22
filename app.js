@@ -41,6 +41,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.listen(2020); 
+app.listen(80); 
+
 console.log('Node Server Started... '); 
 module.exports = app;

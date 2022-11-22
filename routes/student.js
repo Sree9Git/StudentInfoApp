@@ -5,6 +5,8 @@ var mysql = require("mysql");
 
 
 /* GET users listing. */
+/* http://localhost:2020/std/std-reg?name="Sree"&loc="Hyderabad" */ 
+/* Output : Hello i am "Sree" from "Hyderabad" */ 
 router.get("/std-reg", (req, res, next) => {
   const { name, loc } = req.query;
   var output = `Hello i am  ${name} from ${loc} `;
@@ -15,7 +17,7 @@ router.get("/std-reg", (req, res, next) => {
 //POST
 router.post("/reg-std", (req, res, next) => {
   let conn = mysql.createConnection({
-    host: "localhost",
+    host: "192.168.1.26",
     port: 3306,
     user: "root",
     password: "sree",

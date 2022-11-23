@@ -1,0 +1,200 @@
+<script src="lib/react.development.js"></script>
+<script src="lib/react-dom.development.js"></script>
+<script src="lib/babel.js"></script>
+
+<div id="root"></div>
+
+<script type="text/babel">
+  class SignUp extends React.Component {
+    constructor() {
+      super();
+      this.state = {
+        dataObj: {
+          name:'',
+          uid:'',
+          pwd:'',
+          address: '', 
+          country : 'IND',
+          gender: 'M',
+          hobbies : 'Cricket'
+        },
+        isProcessing : false ,
+        result : ''
+      };
+      
+      this.cbArray = ['Cricket'];
+
+      this.funOnChange = this.funOnChange.bind(this);
+    }
+    funSignUp() {
+      //console.log(this.state.dataObj);
+
+      this.setState({
+         isProcessing : true 
+      })
+      
+      var httpRequest = new XMLHttpRequest();
+      httpRequest.open("post", "http://localhost:80/std/reg-std");
+      //httpRequest.setRequestHeader('Access-Control-Allow-Origin', 'http://localhost:2020/std/reg-std');
+      //httpRequest.withCredentials = false;
+      httpRequest.setRequestHeader('Content-Type', 'application/json');
+      
+      console.log(JSON.stringify(this.state.dataObj));
+      httpRequest.send(JSON.stringify(this.state.dataObj));
+
+      httpRequest.onload = () => {
+        var res = httpRequest.responseText
+         res = JSON.parse(res); 
+        //let flag = JSON.stringify(res).includes("Data Inserted Successfull");
+           // flag = false;  // to test data not inserted case 
+        let msg = "Data Not inserted , Please try again.. ";
+
+        if(res.affectedRows > 0) {
+          msg = "Data Inserted Successfully";
+        }
+
+        this.setState({
+          isProcessing : false ,
+          result : msg ,
+          dataObj: {
+            name:'',
+            uid:'',
+            pwd:'',
+            address: '', 
+            country : 'IND',
+            gender: 'M',
+            hobbies : 'Cricket'
+          }
+       })
+      }
+
+      httpRequest.onerror = () => {
+        var res = httpRequest.responseText
+        this.setState({
+          isProcessing : false ,
+          result : msg 
+       })
+      }
+
+
+    }
+
+    funOnChange(eve) {
+      // debugger;
+      //console.log(eve.target.name);
+      //console.log(eve.target.value);
+      const { name, value, type, checked  } = eve.target;
+       //  debugger; 
+      if (type == "checkbox") {
+        if (checked) {
+          this.cbArray.push(name);
+        } else {
+          this.cbArray.splice(this.cbArray.indexOf(name), 1);
+        }
+        this.setState({
+          dataObj: {
+            ...this.state.dataObj,
+            hobbies: this.cbArray.join(),
+          },
+        });
+      } else {
+        this.setState({
+          dataObj: {
+            // [eve.target.name] : eve.target.value
+            ...this.state.dataObj,
+            [name]: value,
+          },
+        });
+      }
+    } // end of "funChange" function
+
+    render() {
+      const {name, uid, pwd, address, gender, hobbies, country } = this.state.dataObj;
+      const {result, isProcessing} = this.state; 
+
+      const isCricket = hobbies.includes('Cricket');
+      const isFootball = hobbies.includes('Football');
+      const isChess = hobbies.includes('Chess');
+
+      return (
+        <div>
+          <h2> SignUp </h2>
+          <p>
+            Name : <input name="name" value={name} onChange={this.funOnChange} />
+          </p>
+          <p>
+            UserId : <input name="uid" value={uid} onChange={this.funOnChange} />
+          </p>
+          <p>
+            Password :{" "}
+            <input name="pwd" type="password" value={pwd} onChange={this.funOnChange} />
+          </p>
+          <p>
+            Gender :{" "}
+            <input
+              type="radio"
+              name="gender"
+              checked={gender=='M'}
+              onChange={this.funOnChange}
+              value="M"
+              
+            />{" "}
+            Male
+            <input
+              type="radio"
+              name="gender"
+              checked={gender=='F'}
+              onChange={this.funOnChange}
+              value="F"
+            />{" "}
+            Female
+          </p>
+          <p>
+            Hobbies :{" "}
+            <input type="checkbox" checked={isCricket} name="Cricket" onChange={this.funOnChange} />{" "}
+            Cricket
+            <input
+              type="checkbox"
+              name="Football"
+              checked={isFootball}
+              onChange={this.funOnChange}
+            />{" "}
+            Footbal
+            <input
+              type="checkbox"
+              name="Chess"
+              checked={isChess}
+              onChange={this.funOnChange}
+            />{" "}
+            Chess
+          </p>
+          <p>
+            <b> Countries : </b>
+            <select name="country" onChange={this.funOnChange}>
+              
+              <option value="IND" selected={country=='IND'}> India </option>
+              <option value="RS" selected={country=='RS'}> Russia </option>
+              <option value="US" selected={country=='US'}> USA </option>
+            </select>
+          </p>
+          <p>
+            <b> Address : </b>{" "}
+            <textarea name="address" value={address} onChange={this.funOnChange}></textarea>
+          </p>
+          <p>
+            <button onClick={this.funSignUp.bind(this)} disabled={this.state.isProcessing}> SignUp </button>
+            
+            {isProcessing && <span> Processing .... </span>}
+            
+          </p>
+          <p>
+              {result}
+          </p>
+        </div>
+      );
+    }
+  }
+
+  //ReactDOM.render(<SignUp/>, document.getElementById('root'));
+  ReactDOM.createRoot(document.getElementById("root")).render(<SignUp />);
+</script>
